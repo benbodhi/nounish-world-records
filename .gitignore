@@ -1,11 +1,11 @@
 .DS_Store
 artifacts
 cache
-scripts
-test
-hardhat.config.js
-package.json
-package-lock.json
+# scripts
+# test
+# hardhat.config.js
+# package.json
+# package-lock.json
 
 # Logs
 logs
