@@ -1,10 +1,10 @@
-/** @type import('hardhat/config').HardhatUserConfig */
-require("@nomiclabs/hardhat-waffle");
+import { HardhatUserConfig } from "hardhat/types";
+import "@nomiclabs/hardhat-waffle";
 
-module.exports = {
+const config: HardhatUserConfig = {
   networks: {
     hardhat: {
-      chainId: 1337 // Choose a suitable chain ID
+      chainId: 1337,
     },
   },
   solidity: {
@@ -23,3 +23,5 @@ module.exports = {
     timeout: 20000
   }
 };
+
+export default config;
