@@ -21,7 +21,7 @@ contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
     event ExecutorChanged(address indexed previousExecutor, address indexed newExecutor);
     event ContractCreated(address indexed recordContract);
 
-    function initialize(address _treasury, address _executor) public initializer {
+    function initialize(address payable _treasury, address _executor) public initializer {
         __Ownable_init();
         __Pausable_init();
 
@@ -31,8 +31,8 @@ contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
         version = 1;
     }
 
-    modifier onlyExecutor() {
-        require(msg.sender == executor, "MainFactory: caller is not the executor");
+    modifier onlyOwnerOrExecutor() {
+        require(msg.sender == owner() || msg.sender == executor, "MainFactory: caller is not the owner or executor");
         _;
     }
 
@@ -56,9 +56,10 @@ contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
         uint256 _amount,
         uint256 _period,
         address _receiver
-    ) external onlyExecutor whenNotPaused returns (address) {
+    ) external onlyOwnerOrExecutor whenNotPaused returns (address) {
         Record record = new Record();
-        record.initialize(_title, _description, _amount, _period, _receiver, address(treasury));
+        address payable treasury_payable = payable(address(treasury));
+        record.initialize(_title, _description, _amount, _period, _receiver, treasury_payable);
         address recordAddress = address(record);
 
         recordContracts[recordAddress] = record;
@@ -77,17 +78,15 @@ contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
         uint256 _amount,
         uint256 _period,
         address _receiver
-    ) public onlyExecutor whenNotPaused {
+    ) public onlyOwnerOrExecutor whenNotPaused {
         Record(_recordContract).updateRecord(_title, _description, _amount, _period, _receiver);
     }
 
-    function pauseRecord(address _recordContract) public whenNotPaused {
-        require(msg.sender == owner() || msg.sender == executor, "MainFactory: caller is not the owner or executor");
+    function pauseRecord(address _recordContract) public onlyOwnerOrExecutor whenNotPaused {
         Record(_recordContract).pause();
     }
 
-    function unpauseRecord(address _recordContract) public whenNotPaused {
-        require(msg.sender == owner() || msg.sender == executor, "MainFactory: caller is not the owner or executor");
+    function unpauseRecord(address _recordContract) public onlyOwnerOrExecutor whenNotPaused {
         Record(_recordContract).unpause();
     }
 

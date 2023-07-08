@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract Treasury is Initializable, PausableUpgradeable, OwnableUpgradeable {
+    address public factory;
     uint256 public version;
 
     mapping(address => bool) public isRecord;
@@ -16,14 +17,27 @@ contract Treasury is Initializable, PausableUpgradeable, OwnableUpgradeable {
         version = 1;
     }
 
+    function setFactory(address _factory) external onlyOwner {
+        require(_factory != address(0), "Invalid address");
+        factory = _factory;
+    }
+
     function deposit() external payable {
         emit Deposit(msg.sender, msg.value);
     }
+
+    // Payable fallback function
+    receive() external payable {}
 
     event Deposit(address indexed sender, uint256 amount);
 
     modifier onlyOwnerOrRecord {
         require(msg.sender == owner() || isRecord[msg.sender], "Caller is not the owner or a record contract");
+        _;
+    }
+
+    modifier onlyOwnerOrFactory {
+        require(msg.sender == owner() || msg.sender == factory, "Caller is not the owner or the factory contract");
         _;
     }
 
@@ -41,11 +55,11 @@ contract Treasury is Initializable, PausableUpgradeable, OwnableUpgradeable {
         return address(this).balance;
     }
 
-    function addRecord(address record) external onlyOwner {
+    function addRecord(address record) external onlyOwnerOrFactory {
         isRecord[record] = true;
     }
 
-    function removeRecord(address record) external onlyOwner {
+    function removeRecord(address record) external onlyOwnerOrFactory{
         isRecord[record] = false;
     }
 }
