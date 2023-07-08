@@ -4,14 +4,19 @@ pragma solidity >=0.8.0 <0.9.0;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./Treasury.sol";
-import "./Record.sol";
+import {Treasury} from "./Treasury.sol";
+import {Record} from "./Record.sol";
 
 contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
     Treasury public treasury;
     address public executor;
     uint256 public version;
     mapping(address => Record) public recordContracts;
+    address[] public allRecords;
+
+    function getAllRecords() public view returns (address[] memory) {
+        return allRecords;
+    }
 
     event ExecutorChanged(address indexed previousExecutor, address indexed newExecutor);
     event ContractCreated(address indexed recordContract);
@@ -57,6 +62,7 @@ contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
         address recordAddress = address(record);
 
         recordContracts[recordAddress] = record;
+        allRecords.push(recordAddress);
         treasury.addRecord(recordAddress);
 
         emit ContractCreated(recordAddress);

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import "./Proxy.sol";
+import {Proxy} from "./Proxy.sol";
 
 contract MainFactoryProxy is Proxy {
     bool public initialized;

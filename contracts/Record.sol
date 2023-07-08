@@ -4,7 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./Treasury.sol";
+import {Treasury} from "./Treasury.sol";
 
 contract Record is Initializable, PausableUpgradeable, OwnableUpgradeable {
     event RecordUpdated(
@@ -95,6 +95,7 @@ contract Record is Initializable, PausableUpgradeable, OwnableUpgradeable {
         }
     }
 
+    // Note: This function can underflow if block.timestamp is less than lastClaimedAt
     function claimableAmountDue() internal view returns (uint256) {
         if (block.timestamp < lastClaimedAt) {
             return 0;

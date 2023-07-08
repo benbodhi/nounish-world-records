@@ -16,7 +16,11 @@ contract Treasury is Initializable, PausableUpgradeable, OwnableUpgradeable {
         version = 1;
     }
 
-    function deposit() external payable {}
+    function deposit() external payable {
+        emit Deposit(msg.sender, msg.value);
+    }
+
+    event Deposit(address indexed sender, uint256 amount);
 
     modifier onlyOwnerOrRecord {
         require(msg.sender == owner() || isRecord[msg.sender], "Caller is not the owner or a record contract");
