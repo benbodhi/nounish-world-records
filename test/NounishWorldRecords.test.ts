@@ -7,9 +7,9 @@ describe("Contract Interaction Tests", function () {
 
   beforeEach(async function () {
     [owner, executor, other] = await ethers.getSigners();
-    console.log("Owner address:", owner.address);
-    console.log("Executor address:", executor.address);
-    console.log("Other address:", other.address);
+    // console.log("Owner address:", owner.address);
+    // console.log("Executor address:", executor.address);
+    // console.log("Other address:", other.address);
 
     // Deploy MainFactory contract
     const MainFactory = await ethers.getContractFactory("MainFactory");

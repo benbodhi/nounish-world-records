@@ -4,14 +4,32 @@ pragma solidity >=0.8.0 <0.9.0;
 import {Proxy} from "./Proxy.sol";
 
 contract TreasuryProxy is Proxy {
-    bool public initialized;
+    address public treasuryLogic;
+    address private _owner;
 
-    function initialize(address _owner, address _logic, bytes memory _data) public payable {
-        require(!initialized, "Already initialized");
-        require(_logic != address(0), "Invalid logic address");
-        require(_owner != address(0), "Invalid owner address");
-        owner = _owner;
-        _upgradeToAndCall(_logic, _data, false);
-        initialized = true;
+    modifier onlyOwner() {
+        require(msg.sender == _owner, "Ownable: caller is not the owner");
+        _;
+    }
+
+    constructor(address _treasuryLogic) {
+        treasuryLogic = _treasuryLogic;
+        _owner = msg.sender; // set the owner to be the account deploying the contract
+    }
+
+    function _implementation() internal view override returns (address) {
+        return treasuryLogic;
+    }
+
+    function upgradeTo(address newTreasuryLogic) external onlyOwner {
+        treasuryLogic = newTreasuryLogic;
+    }
+
+    function getOwner() external view returns (address) {
+        return _owner;
+    }
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        _owner = newOwner;
     }
 }
