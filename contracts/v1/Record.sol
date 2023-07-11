@@ -96,10 +96,6 @@ contract Record is Initializable, PausableUpgradeable, OwnableUpgradeable {
         return claimable;
     }
 
-    function getClaimableAmountDue() public view returns (uint256) {
-        return claimableAmountDue();
-    }
-
     function claim() public whenNotPaused {
         require(receiver != address(0), "Invalid receiver address");
         uint256 claimable = claimableAmountDue();
