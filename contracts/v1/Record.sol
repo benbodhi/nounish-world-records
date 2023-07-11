@@ -52,9 +52,7 @@ contract Record is Initializable, PausableUpgradeable, OwnableUpgradeable {
         receiver = _receiver;
         treasury = Treasury(_treasury);
         lastClaimedAt = block.timestamp;
-        totalClaimed = 0;
         createdAt = block.timestamp;
-        totalPausedTime = 0;
     }
 
     function updateRecord(
