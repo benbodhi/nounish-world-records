@@ -41,6 +41,10 @@ contract Treasury is Initializable, PausableUpgradeable, OwnableUpgradeable {
         _;
     }
 
+    function getOwner() external view returns (address) {
+        return owner();
+    }
+
     function withdraw(address payable _to, uint256 _amount) external onlyOwnerOrRecord {
         require(address(this).balance >= _amount, "Insufficient balance");
         _to.transfer(_amount);

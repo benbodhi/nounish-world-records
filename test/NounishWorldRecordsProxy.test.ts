@@ -15,7 +15,6 @@ describe("Proxy Contract Interaction Tests", function () {
     console.log("Setting up beforeEach...");
 
     [owner, executor, other] = await ethers.getSigners();
-    console.log("Signers obtained.");
     console.log("Owner address:", owner.getAddress());
     console.log("Executor address:", executor.getAddress());
     console.log("Other address:", other.getAddress());
@@ -41,28 +40,12 @@ describe("Proxy Contract Interaction Tests", function () {
     await treasuryProxy.deployed();
     console.log("Treasury proxy contract deployed at: ", treasuryProxy.address);
 
-    // Transfer ownership of Treasury proxy contract
-    // console.log("Transferring ownership of Treasury proxy contract...");
-    // const initialTreasuryOwner = await treasuryProxy.getOwner();
-    // console.log("Initial Treasury owner: ", initialTreasuryOwner);
-    // await treasuryProxy.transferOwnership(owner.getAddress());
-    // const finalTreasuryOwner = await treasuryProxy.getOwner();
-    // console.log("Final Treasury owner: ", finalTreasuryOwner);
-
     // Deploy MainFactory proxy contract
     const MainFactoryProxy = await ethers.getContractFactory("MainFactoryProxy");
     // console.log("Deploying MainFactory proxy contract...");
     const mainFactoryProxy = await MainFactoryProxy.deploy(mainFactoryLogic.address);
     await mainFactoryProxy.deployed();
     console.log("MainFactory proxy contract deployed at: ", mainFactoryProxy.address);
-
-    // Transfer ownership of MainFactory proxy contract
-    // console.log("Transferring ownership of MainFactory proxy contract...");
-    // const initialMainFactoryOwner = await mainFactoryProxy.getOwner();
-    // console.log("Initial MainFactory owner: ", initialMainFactoryOwner);
-    // await mainFactoryProxy.transferOwnership(owner.getAddress());
-    // const finalMainFactoryOwner = await mainFactoryProxy.getOwner();
-    // console.log("Final MainFactory owner: ", finalMainFactoryOwner);
 
     // Initialize the Treasury contract
     await treasuryLogic.initialize();
@@ -71,6 +54,22 @@ describe("Proxy Contract Interaction Tests", function () {
     // Initialize the MainFactory contract
     await mainFactoryLogic.initialize(treasuryProxy.address, owner.getAddress());
     console.log("MainFactory initialized with Treasury:", treasuryProxy.address, "and Executor:", owner.getAddress());
+
+    // Transfer ownership of Treasury logic contract
+    console.log("Transferring ownership of Treasury logic contract...");
+    const initialTreasuryOwner = await treasuryLogic.getOwner();
+    console.log("Initial Treasury owner: ", initialTreasuryOwner);
+    await treasuryLogic.transferOwnership(treasuryProxy.address);
+    const finalTreasuryOwner = await treasuryLogic.getOwner();
+    console.log("Final Treasury owner: ", finalTreasuryOwner);
+
+    // Transfer ownership of MainFactory logic contract
+    console.log("Transferring ownership of MainFactory logic contract...");
+    const initialMainFactoryOwner = await mainFactoryLogic.getOwner();
+    console.log("Initial MainFactory owner: ", initialMainFactoryOwner);
+    await mainFactoryLogic.transferOwnership(mainFactoryProxy.address);
+    const finalMainFactoryOwner = await mainFactoryLogic.getOwner();
+    console.log("Final MainFactory owner: ", finalMainFactoryOwner);
 
     // Create instances of the logic contracts at the proxy contracts' addresses
     console.log("Creating contract instances at proxy addresses...");
@@ -92,11 +91,27 @@ describe("Proxy Contract Interaction Tests", function () {
     console.log("TreasuryLogic Owner:", await treasuryLogic.owner());
     console.log("mainFactoryProxy.getOwner():", await mainFactoryProxy.getOwner());
     console.log("MainFactoryLogic Owner:", await mainFactoryLogic.owner());
-    console.log("Owner address:", owner.getAddress());
 
+    // Fetch the implementation address of the TreasuryProxy contract
+    const treasuryProxyImplementationAddress = await ethers.provider.getStorageAt(TreasuryProxyInstance.address, ethers.constants.HashZero);
+    console.log("TreasuryProxy implementation address:", treasuryProxyImplementationAddress);
+
+    // Fetch the implementation address of the MainFactoryProxy contract
+    const mainFactoryProxyImplementationAddress = await ethers.provider.getStorageAt(MainFactoryProxyInstance.address, ethers.constants.HashZero);
+    console.log("MainFactoryProxy implementation address:", mainFactoryProxyImplementationAddress);
+
+    // // Set the factory address on the treasury
+    // console.log("Setting factory address on Treasury...");
+    // // await TreasuryProxyInstance.connect(owner).setFactory(mainFactoryProxy.address);
+    // await TreasuryProxyInstance.connect(treasuryProxy.address).setFactory(mainFactoryProxy.address);
+    // console.log("Factory address set on Treasury.");
+
+    // Connect to the TreasuryProxy contract with the owner
+    const connectedTreasuryProxyInstance = TreasuryProxyInstance.connect(owner);
+    // Get the address of the MainFactoryProxy contract
+    const mainFactoryProxyAddress = mainFactoryProxy.address;
     // Set the factory address on the treasury
-    console.log("Setting factory address on Treasury...");
-    await TreasuryProxyInstance.connect(owner).setFactory(mainFactoryProxy.address);
+    await connectedTreasuryProxyInstance.setFactory(mainFactoryProxyAddress);
     console.log("Factory address set on Treasury.");
 
     // Deposit 20 ETH into the treasury

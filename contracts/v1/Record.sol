@@ -76,6 +76,10 @@ contract Record is Initializable, PausableUpgradeable, OwnableUpgradeable {
         receiver = _receiver;
     }
 
+    function getOwner() external view returns (address) {
+        return owner();
+    }
+
     function pause() public onlyOwner {
         if (!paused()) {
             claim();

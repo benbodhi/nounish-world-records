@@ -36,6 +36,10 @@ contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
         _;
     }
 
+    function getOwner() external view returns (address) {
+        return owner();
+    }
+
     function changeExecutor(address _newExecutor) public onlyOwner {
         require(_newExecutor != address(0), "MainFactory: new executor address is zero");
         emit ExecutorChanged(executor, _newExecutor);
