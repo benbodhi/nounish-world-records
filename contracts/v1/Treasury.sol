@@ -7,14 +7,12 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract Treasury is Initializable, PausableUpgradeable, OwnableUpgradeable {
     address public factory;
-    uint256 public version;
-
+    uint256 public constant version = 1;
     mapping(address => bool) public isRecord;
 
     function initialize() public initializer {
         __Ownable_init();
         __Pausable_init();
-        version = 1;
     }
 
     function setFactory(address _factory) external onlyOwner {

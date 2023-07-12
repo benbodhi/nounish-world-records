@@ -10,7 +10,7 @@ import {Record} from "./Record.sol";
 contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
     Treasury public treasury;
     address public executor;
-    uint256 public version;
+    uint256 public constant version = 1;
     mapping(address => Record) public recordContracts;
     address[] public allRecords;
 
@@ -28,7 +28,6 @@ contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
         require(_treasury != address(0) && _executor != address(0), "Invalid address");
         treasury = Treasury(_treasury);
         executor = _executor;
-        version = 1;
     }
 
     modifier onlyOwnerOrExecutor() {
