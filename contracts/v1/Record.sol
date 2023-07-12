@@ -32,7 +32,7 @@ contract Record is Initializable, PausableUpgradeable, OwnableUpgradeable {
     uint256 public lastClaimedAt;
     uint256 public totalClaimed;
     uint256 public totalPausedTime;
-    uint256 public version;
+    uint256 public constant version = 1;
 
     function initialize(
         string memory _title,
@@ -52,10 +52,7 @@ contract Record is Initializable, PausableUpgradeable, OwnableUpgradeable {
         receiver = _receiver;
         treasury = Treasury(_treasury);
         lastClaimedAt = block.timestamp;
-        totalClaimed = 0;
-        version = 1;
         createdAt = block.timestamp;
-        totalPausedTime = 0;
     }
 
     function updateRecord(
@@ -97,10 +94,6 @@ contract Record is Initializable, PausableUpgradeable, OwnableUpgradeable {
         uint256 elapsedTime = block.timestamp - lastClaimedAt;
         uint256 claimable = elapsedTime * amount / period;
         return claimable;
-    }
-
-    function getClaimableAmountDue() public view returns (uint256) {
-        return claimableAmountDue();
     }
 
     function claim() public whenNotPaused {
