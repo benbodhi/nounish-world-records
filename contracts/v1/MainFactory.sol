@@ -14,10 +14,6 @@ contract MainFactory is Initializable, PausableUpgradeable, OwnableUpgradeable {
     mapping(address => Record) public recordContracts;
     address[] public allRecords;
 
-    function getAllRecords() public view returns (address[] memory) {
-        return allRecords;
-    }
-
     event ExecutorChanged(address indexed previousExecutor, address indexed newExecutor);
     event ContractCreated(address indexed recordContract);
 
